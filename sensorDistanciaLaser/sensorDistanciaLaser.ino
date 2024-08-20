@@ -5,7 +5,7 @@
 #define XSHUT_Sensor1 6
 
 //Definição dos endereços dos sensores VL53L0X. Endereço padrão: 0b0101001 ou 41.
-#define Sensor1_endereco 42
+#define Sensor1_endereco 41
 
 VL53L0X Sensor1;
 
