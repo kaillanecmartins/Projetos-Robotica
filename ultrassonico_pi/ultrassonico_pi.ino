@@ -102,8 +102,17 @@ void loop() {
 
   distancia = tempo/58;
 
-  Serial.println(distancia);
+  //Serial.println(distancia);
 
+  if(distancia < 5){
+    led.red();
+  }else if(distancia < 15){
+    led.blue();
+  }else if(distancia < 20){
+    led.green();
+  }else if(distancia >= 20){
+    led.white();                            
+  }
   delay(500);  
 
 }
