@@ -20,7 +20,7 @@ void setup() {
   pinMode(IN4, OUTPUT);
 
   Serial.begin(115200);
-  SerialBT.begin("Extra"); // Nome do dispositivo Bluetooth
+  SerialBT.begin("novo"); // Nome do dispositivo Bluetooth
 }
 
 void loop() {

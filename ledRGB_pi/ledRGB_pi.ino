@@ -1,5 +1,5 @@
-#define LedR 16
-#define LedG 17
+#define LedR 17
+#define LedG 16
 #define LedB 15
 
 //biblioteca Github: https://github.com/samueldesaa/Robotic-Projects/blob/main/Arduino/ledPWM-Ultrasonic-Classes.ino
@@ -76,6 +76,6 @@ void setup() {
 }
 
 void loop() {
-  led.blue(); 
+  led.white(); 
   led.off();
 }
