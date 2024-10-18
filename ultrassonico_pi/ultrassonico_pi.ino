@@ -103,7 +103,7 @@ void loop() {
   distancia = tempo/58;
 
   //Serial.println(distancia);
-
+  
   if(distancia < 5){
     led.red();
   }else if(distancia < 15){
