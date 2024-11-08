@@ -21,29 +21,33 @@ void loop() {
 
   Dabble.processInput();
 
-  char c = Serial.read();
+  int c = bluetooth.read();
 
-  switch (c) {
-    case 'F':
-      frente();
-      break;
-    case 'A':
-      frente();
-      break;
-    case 'L':
-      esquerda();
-      break;
-    case 'R':
-      direita();
-      break;
-    case 'B':
-      tras();
-      break;
-    case 'S':
-      para();
-      break;
+  
+
+  if (bluetooth.available() > 0) {
+    
+    switch (c) {
+      case 'F':
+        frente();
+        break;
+      case 'A':
+        frente();
+        break;
+      case 'L':
+        esquerda();
+        break;
+      case 'R':
+        direita();
+        break;
+      case 'B':
+        tras();
+        break;
+      case 'S':
+        para();
+        break;
+    }
   }
-
 }
 
 //********************Movimenta o robô para frente********************
