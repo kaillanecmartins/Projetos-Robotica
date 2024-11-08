@@ -15,36 +15,43 @@ void setup() {
   //Iniciar monitor serial
   Serial.begin(9600);
   Dabble.begin(9600);
+  bluetooth.begin(9600);
 }
 
 void loop() {
 
   Dabble.processInput();
 
-  int c = bluetooth.read();
+  int c;
 
-  
 
   if (bluetooth.available() > 0) {
     
+    c = bluetooth.read();
     switch (c) {
       case 'F':
         frente();
+        bluetooth.println("F");
         break;
       case 'A':
         frente();
+        bluetooth.println("F");
         break;
       case 'L':
         esquerda();
+        bluetooth.println("F");
         break;
       case 'R':
         direita();
+        bluetooth.println("F");
         break;
       case 'B':
         tras();
+        bluetooth.println("F");
         break;
       case 'S':
         para();
+        bluetooth.println("F");
         break;
     }
   }
