@@ -1,9 +1,12 @@
 #include <AFMotor.h> // Biblioteca do motor shield
 #include <Dabble.h> // incluindo biblioteca do app Dabble
+#include "SoftwareSerial.h"
+
 //********************Criação dos objetos********************
 
-AF_DCMotor motor1(1); // Motor esquerdo
-AF_DCMotor motor2(2); // Motor direito
+AF_DCMotor motor1(3); // Motor esquerdo
+AF_DCMotor motor2(4); // Motor direito
+SoftwareSerial bluetooth(19, 18); //TX, RX (Bluetooth)
 
 void setup() {
   // Configuração de velocidade dos motores
@@ -17,11 +20,6 @@ void setup() {
 void loop() {
 
   Dabble.processInput();
-  //teste motores
-
-  frente();
-  delay(500);
-  tras();
 
   char c = Serial.read();
 
