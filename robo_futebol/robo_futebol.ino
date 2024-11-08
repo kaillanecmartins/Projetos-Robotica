@@ -1,5 +1,4 @@
 #include <AFMotor.h> // Biblioteca do motor shield
-#include <Dabble.h> // incluindo biblioteca do app Dabble
 #include "SoftwareSerial.h"
 
 //********************Criação dos objetos********************
@@ -14,13 +13,10 @@ void setup() {
   motor2.setSpeed(255);
   //Iniciar monitor serial
   Serial.begin(9600);
-  Dabble.begin(9600);
   bluetooth.begin(9600);
 }
 
 void loop() {
-
-  Dabble.processInput();
 
   int c;
 
@@ -54,6 +50,7 @@ void loop() {
         bluetooth.println("F");
         break;
     }
+    
   }
 }
 
