@@ -1,5 +1,5 @@
 #include <AFMotor.h> // Biblioteca do motor shield
-
+#include <Dabble.h> // incluindo biblioteca do app Dabble
 //********************Criação dos objetos********************
 
 AF_DCMotor motor1(1); // Motor esquerdo
@@ -11,9 +11,17 @@ void setup() {
   motor2.setSpeed(255);
   //Iniciar monitor serial
   Serial.begin(9600);
+  Dabble.begin(9600);
 }
 
 void loop() {
+
+  Dabble.processInput();
+  //teste motores
+
+  frente();
+  delay(500);
+  tras();
 
   char c = Serial.read();
 
