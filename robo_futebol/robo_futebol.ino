@@ -67,3 +67,10 @@ void esquerda() {
   motor1.run(FORWARD); // Motor esquerdo
   motor2.run(BACKWARD); // Motor direito
 }
+
+//********************Movimenta o robô para direita********************
+
+void direita() {
+  motor1.run(BACKWARD); // Motor esquerdo
+  motor2.run(FORWARD); // Motor direito
+}
