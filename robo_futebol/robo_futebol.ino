@@ -10,7 +10,7 @@ SoftwareSerial bluetooth(19, 18); //TX, RX (Bluetooth)
 void setup() {
   // Configuração de velocidade dos motores
   motor1.setSpeed(180); // Velocidade vai de 0 a 255
-  motor2.setSpeed(255);
+  motor2.setSpeed(250);
   //Iniciar monitor serial
   Serial.begin(9600);
   bluetooth.begin(9600);
