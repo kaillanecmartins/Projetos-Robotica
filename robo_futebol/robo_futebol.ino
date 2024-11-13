@@ -3,13 +3,13 @@
 
 //********************Criação dos objetos********************
 
-AF_DCMotor motor1(3); // Motor esquerdo
-AF_DCMotor motor2(4); // Motor direito
+AF_DCMotor motor1(3); // Motor direito
+AF_DCMotor motor2(4); // Motor esquerdo
 SoftwareSerial bluetooth(19, 18); //TX, RX (Bluetooth)
 
 void setup() {
   // Configuração de velocidade dos motores
-  motor1.setSpeed(255); // Velocidade vai de 0 a 255
+  motor1.setSpeed(170); // Velocidade vai de 0 a 255
   motor2.setSpeed(255);
   //Iniciar monitor serial
   Serial.begin(9600);
