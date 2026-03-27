@@ -1,6 +1,8 @@
 #include <BnrOneAPlus.h>  // Bot'n Roll ONE A+ library
 #include <SPI.h>  // SPI communication library required by BnrOneAPlus.cpp
 BnrOneAPlus one;  // object to control the Bot'n Roll ONE A+
+#include <Servo.h>
+#include <Ultrasonic.h>
 
 // Constants definitions
 // Definir constantes
@@ -8,6 +10,11 @@ BnrOneAPlus one;  // object to control the Bot'n Roll ONE A+
 #define M1 1  // Motor1
 #define M2 2  // Motor2
 #define MINIMUM_BATTERY_V 10.5  // safety voltage for discharging the battery
+
+Servo servoA;
+
+int angAberto = 0;
+int angFechado = 90;
 
 // Transition value between white and black
 // Valor de transição entre branco e preto
@@ -18,10 +25,11 @@ BnrOneAPlus one;  // object to control the Bot'n Roll ONE A+
 int speed = 10;
 
 void setup() {
-  Serial.begin(115200);   // sets baud rate to 115200bps for printing values at
-                          // serial monitor.
-  one.spiConnect(SSPIN);  // starts the SPI communication module
-  one.stop();             // stop motors
+  Serial.begin(115200);
+  servoA.attach(6);
+ 
+  one.spiConnect(SSPIN);  
+  one.stop();             
   one.setMinBatteryV(MINIMUM_BATTERY_V);  // battery discharge protection
 
   one.lcd1(" Bot'n Roll ONE");
