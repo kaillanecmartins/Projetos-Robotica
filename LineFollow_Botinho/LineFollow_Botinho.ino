@@ -39,6 +39,9 @@ void setup() {
   while (one.readButton() == 0)
     ;
   one.lcd2("Line Following!");
+  one.move(10, 10);
+  delay(1000);
+  one.stop();
 }
 
 void loop() {
@@ -55,7 +58,7 @@ void loop() {
 
   // From left to centre
   // Lado esquerdo do exterior para o centro
-  if (sensor2 > BW_THRESHOLD)  // 10000000
+  if (sensor0 > BW_THRESHOLD)  // 10000000
   {
     one.move(-7, 10);
   } else if (sensor1 > BW_THRESHOLD)  // 01000000
@@ -70,7 +73,7 @@ void loop() {
   }
   // From right to centre
   // Lado direito do exterior para o centro
-  else if (sensor5 > BW_THRESHOLD)  // 00000001
+  else if (sensor7 > BW_THRESHOLD)  // 00000001
   {
     one.move(10, -7);
   } else if (sensor6 > BW_THRESHOLD)  // 00000010
