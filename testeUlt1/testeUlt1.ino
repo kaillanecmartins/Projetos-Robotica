@@ -14,8 +14,8 @@ BnrOneAPlus one;  // object to control the Bot'n Roll ONE A+
 Servo servoA;
 Ultrasonic ult1(A5, A4);
 
-int angAberto = 20;
-int angFechado = 180;
+int angAberto = 120;
+int angFechado = 0;
 
 // Transition value between white and black
 // Valor de transição entre branco e preto
