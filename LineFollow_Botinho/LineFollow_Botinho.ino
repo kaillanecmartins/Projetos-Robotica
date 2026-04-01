@@ -1,89 +1,144 @@
-#include <BnrOneAPlus.h>  // Bot'n Roll ONE A+ library
-#include <SPI.h>  // SPI communication library required by BnrOneAPlus.cpp
-BnrOneAPlus one;  // object to control the Bot'n Roll ONE A+
+#include <BnrOneAPlus.h>
+#include <SPI.h>
 #include <Servo.h>
 #include <Ultrasonic.h>
 
-// Constants definitions
-// Definir constantes
-#define SSPIN 2  // Slave Select (SS) pin for SPI communication
-#define M1 1  // Motor1
-#define M2 2  // Motor2
-#define MINIMUM_BATTERY_V 10.5  // safety voltage for discharging the battery
+BnrOneAPlus one;
 
-Servo servoA;
+// ================= CONFIG =================
+#define SSPIN 2
+#define MINIMUM_BATTERY_V 10.5
 
-int angAberto = 0;
-int angFechado = 90;
-
-// Transition value between white and black
-// Valor de transição entre branco e preto
 #define BW_THRESHOLD 300
+#define DIST_OBJ 10   // distância em cm para detectar objeto
 
-// Speed for the robot movement
-// Velocidade do robô
-int speed = 10;
+// ================= OBJETOS =================
+Servo servoA;
+Ultrasonic ult1(A0, A1);
 
+// ================= CONTROLE =================
+int speed = 6;
+
+// Servo
+int angAberto = 0;
+int angFechado = 120;
+
+// Controle de estado
+String estado = "SEGUIR";
+
+// Controle de leitura do ultrassônico (economia)
+unsigned long lastRead = 0;
+
+// ================= SETUP =================
 void setup() {
   Serial.begin(115200);
-  servoA.attach(6);
- 
-  one.spiConnect(SSPIN);  
-  one.stop();             
-  one.setMinBatteryV(MINIMUM_BATTERY_V);  // battery discharge protection
 
-  one.lcd1(" Bot'n Roll ONE");
-  one.lcd2("Press a button!");
-  // Wait for a button to be pressed to move motors
-  // Espera pressionar um botão para mover motores
-  while (one.readButton() == 0)
-    ;
-  one.lcd2("Line Following!");
-  one.move(10, 10);
-  delay(1000);
+  servoA.attach(6);
+  servoA.write(angAberto);
+
+  one.spiConnect(SSPIN);
   one.stop();
+  one.setMinBatteryV(MINIMUM_BATTERY_V);
+
+  one.lcd1("Bot'n Roll");
+  one.lcd2("Pressione...");
+  one.move(10, 10);
+  while (one.readButton() == 0);
+
+  one.lcd2("Rodando...");
+  
 }
 
-void loop() {
-  // Read the 8 sensors
-  // Ler os 8 sensores
-  int sensor0 = one.readAdc(0);
-  int sensor1 = one.readAdc(1);
-  int sensor2 = one.readAdc(2);
-  int sensor3 = one.readAdc(3);
-  int sensor4 = one.readAdc(4);
-  int sensor5 = one.readAdc(5);
-  int sensor6 = one.readAdc(6);
-  int sensor7 = one.readAdc(7);
+// ================= FUNÇÃO SEGUIR LINHA =================
+void seguirLinha() {
 
-  // From left to centre
-  // Lado esquerdo do exterior para o centro
-  if (sensor0 > BW_THRESHOLD)  // 10000000
-  {
-    one.move(-7, 10);
-  } else if (sensor1 > BW_THRESHOLD)  // 01000000
-  {
-    one.move(5, 10);
-  } else if (sensor2 > BW_THRESHOLD)  // 00100000
-  {
-    one.move(20, 10);
-  } else if (sensor3 > BW_THRESHOLD)  // 00010000
-  {
+  int s2 = one.readAdc(2);
+  int s3 = one.readAdc(3);
+  int s4 = one.readAdc(4);
+  int s5 = one.readAdc(5);
+
+  // linha central
+  if (s3 > BW_THRESHOLD && s4 > BW_THRESHOLD) {
     one.move(speed, speed);
   }
-  // From right to centre
-  // Lado direito do exterior para o centro
-  else if (sensor7 > BW_THRESHOLD)  // 00000001
-  {
-    one.move(10, -7);
-  } else if (sensor6 > BW_THRESHOLD)  // 00000010
-  {
-    one.move(10, 5);
-  } else if (sensor5 > BW_THRESHOLD)  // 00000100
-  {
-    one.move(10, 20);
-  } else if (sensor4 > BW_THRESHOLD)  // 00001000
-  {
-    one.move(speed, speed);
+
+  // leve esquerda
+  else if (s2 > BW_THRESHOLD) {
+    one.move(3, speed);
   }
+
+  // leve direita
+  else if (s5 > BW_THRESHOLD) {
+    one.move(speed, 3);
+  }
+
+  // correção mais forte
+  else if (s3 > BW_THRESHOLD) {
+    one.move(2, speed);
+  }
+  else if (s4 > BW_THRESHOLD) {
+    one.move(speed, 2);
+  }
+
+  // perdeu linha
+  else {
+    one.move(4, -4);
+  }
+}
+
+// ================= PEGAR OBJETO =================
+void pegarObjeto() {
+
+  one.stop();
+  delay(200);
+
+  // aproxima mais um pouco
+  one.move(5,5);
+  delay(400);
+
+  one.stop();
+
+  // fecha garra
+  servoA.write(angFechado);
+  delay(800);
+
+  // economia: desliga servo
+  servoA.detach();
+}
+
+// ================= LOOP =================
+void loop() {
+
+  if (estado == "SEGUIR") {
+
+    seguirLinha();
+
+    // leitura do ultrassônico com intervalo (economia)
+    if (millis() - lastRead > 150) {
+
+      lastRead = millis();
+
+      int d = ult1.read();
+
+      Serial.print("Dist: ");
+      Serial.println(d);
+
+      if (d > 0 && d < DIST_OBJ) {
+        estado = "PEGAR";
+      }
+    }
+  }
+
+  else if (estado == "PEGAR") {
+
+    pegarObjeto();
+    estado = "PARAR";
+  }
+
+  else if (estado == "PARAR") {
+
+    one.stop();
+  }
+
+  delay(20);
 }
