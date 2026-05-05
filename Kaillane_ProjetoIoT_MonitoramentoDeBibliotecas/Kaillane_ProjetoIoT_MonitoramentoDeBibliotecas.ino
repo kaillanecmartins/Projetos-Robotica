@@ -7,6 +7,7 @@
 #define DHT_pin 15
 #define KY_pin 2
 #define LDR_pin 4
+#define PIR_pin 22
 
 #define DHTTYPE DHT11
 
@@ -23,6 +24,7 @@ void setup(){
   pinMode(DHT_pin, INPUT);
   pinMode(KY_pin, INPUT);
   pinMode(LDR_pin, INPUT);
+  pinMode(PIR_pin, INPUT);
 
   dht.begin();
 }
@@ -33,6 +35,7 @@ void loop(){
   float umidade = dht.readHumidity();
   int luminosidade = analogRead(LDR_pin);
   int barulho = analogRead(KY_pin);
+  int presenca = digitalRead(PIR_pin);
   
   Serial.print("Temperatura: ");
   Serial.println(temp);
@@ -42,7 +45,10 @@ void loop(){
   Serial.println(luminosidade);
   Serial.print("Barulho: ");
   Serial.println(barulho);
+  Serial.print("Presença: ");
+  Serial.println(presenca);
 
+  /*
   if(barulho < 600){
     digitalWrite(R_pin, HIGH);
     digitalWrite(G_pin, LOW);
@@ -52,6 +58,18 @@ void loop(){
     digitalWrite(R_pin, LOW);
     digitalWrite(G_pin, HIGH);
     digitalWrite(B_pin, LOW);
+  }*/
+
+  if(presenca){
+    LED_RGB(1,0,0);
+  }else{
+    LED_RGB(0,1,0);
   }
   delay(1000);
+}
+
+void LED_RGB(int modeR, int modeG, int modeB){
+    digitalWrite(R_pin, modeR);
+    digitalWrite(G_pin, modeG);
+    digitalWrite(B_pin, modeB);
 }
