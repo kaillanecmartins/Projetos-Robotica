@@ -10,7 +10,7 @@
 //#define LDR_pin 4
 //#define PIR_pin 22
 #define IR1_pin 22
-#define IR2_pin 15
+#define IR2_pin 5
 
 #define DHTTYPE DHT11
 
