@@ -1,6 +1,6 @@
 #include <DHT.h>
 
-#define R_pin1 4
+#define R_pin1 5
 #define G_pin1 18
 #define R_pin2 19
 #define G_pin2 21
@@ -10,7 +10,7 @@
 //#define LDR_pin 4
 //#define PIR_pin 22
 #define IR1_pin 22
-#define IR2_pin 5
+#define IR2_pin 4
 
 #define DHTTYPE DHT11
 
@@ -73,14 +73,14 @@ void loop(){
   }*/
 
   //detecção com ir simples
-  if(ir1){
+  if(ir1 == 1){
     LED_RG1(1, 0);
   }else{
     LED_RG1(0,1);
   }
 
   //detecção com ir complexo
-  if(ir2){
+  if(ir2 == 1){
     LED_RG2(1, 0);
   }else{
     LED_RG2(0,1);
