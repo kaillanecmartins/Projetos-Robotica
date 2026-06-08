@@ -1,13 +1,13 @@
 #include <DHT.h>
 
-#define led1 18
-#define led2 19
+#define led1 19
+#define led2 18
 
 #define DHT_pin 15
 #define KY_pin 2
-//#define PIR_pin 22
-#define IR1_pin 22
-#define IR2_pin 4
+#define PIR_pin 22
+#define IR1_pin 4
+//#define IR2_pin 4
 
 #define DHTTYPE DHT11
 
@@ -22,10 +22,10 @@ void setup(){
 
   pinMode(DHT_pin, INPUT);
   pinMode(IR1_pin, INPUT);
-  pinMode(IR2_pin, INPUT);
+  //pinMode(IR2_pin, INPUT);
   pinMode(KY_pin, INPUT);
  // pinMode(LDR_pin, INPUT);
-  //pinMode(PIR_pin, INPUT);
+  pinMode(PIR_pin, INPUT);
 
   dht.begin();
 }
@@ -35,9 +35,9 @@ void loop(){
   float temp = dht.readTemperature();
   float umidade = dht.readHumidity();
   int ir1 = digitalRead(IR1_pin);
-  int ir2 = digitalRead(IR2_pin);
+  //int ir2 = digitalRead(IR2_pin);
   int barulho = analogRead(KY_pin);
-  //int presenca = digitalRead(PIR_pin);
+  int presenca = digitalRead(PIR_pin);
   
   Serial.print("Temperatura: ");
   Serial.println(temp);
@@ -45,22 +45,22 @@ void loop(){
   Serial.println(umidade);
   Serial.print("IR simples: ");
   Serial.println(ir1);
-  Serial.print("IR complexo: ");
-  Serial.println(ir2);
+  /*Serial.print("IR complexo: ");
+  Serial.println(ir2);*/
   Serial.print("Barulho: ");
   Serial.println(barulho);
-  /*Serial.print("Presença: ");
-  Serial.println(presenca);*/
+  Serial.print("Presença: ");
+  Serial.println(presenca);
 
   //detecção com ir simples
-  if(ir1 == 1){
+  if(ir1 == 0){
     digitalWrite(led1, HIGH);
   }else{
     digitalWrite(led1, LOW);
   }
 
-  //detecção com ir complexo
-  if(ir2 == 1){
+  //detecção com pir
+  if(presenca == 1){
     digitalWrite(led2, HIGH);
   }else{
     digitalWrite(led2, LOW);
