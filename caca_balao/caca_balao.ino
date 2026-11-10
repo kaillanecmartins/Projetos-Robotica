@@ -1,18 +1,103 @@
 #include <SoftwareSerial.h>
 
-SoftwareSerial SerialBT(10, 11); // RX = 10, TX = 11 do Arduino (HC-05)
+// Comunicação Bluetooth HC-05
+SoftwareSerial serialdobluetooth(8, 9);
 
-const int A_IA = 5;  // Motor direito
-const int A_IB = 6;
+// Pinos da ponte H L9110S
+const int A_IA = 3;
+const int A_IB = 5;
+const int B_IA = 10;
+const int B_IB = 11;
 
-const int B_IA = 9;  // Motor esquerdo
-const int B_IB = 3;
+// Configurações
+int VELOCIDADE = 200;
+const unsigned long TEMPO_MOVIMENTO = 500;
 
-int velocidade = 250; // Velocidade dos motores (0 a 255)
+int valordobluetooth = 0;
+
+unsigned long tempoInicio = 0;
+bool movimentoAtivo = false;
+
+
+void motor(int pinIA, int pinIB, int velocidade) {
+
+  velocidade = constrain(velocidade, -255, 255);
+
+  if (velocidade > 0) {
+    analogWrite(pinIA, velocidade);
+    digitalWrite(pinIB, LOW);
+  }
+
+  else if (velocidade < 0) {
+    digitalWrite(pinIA, LOW);
+    analogWrite(pinIB, -velocidade);
+  }
+
+  else {
+    digitalWrite(pinIA, LOW);
+    digitalWrite(pinIB, LOW);
+  }
+}
+
+void motorA(int v) {
+  motor(A_IA, A_IB, v);
+}
+
+void motorB(int v) {
+  motor(B_IA, B_IB, v);
+}
+
+
+void frente() {
+  motorA(VELOCIDADE);
+  motorB(VELOCIDADE);
+}
+
+void tras() {
+  motorA(-VELOCIDADE);
+  motorB(-VELOCIDADE);
+}
+
+void esquerda() {
+  motorA(-VELOCIDADE);
+  motorB(VELOCIDADE);
+}
+
+void direita() {
+  motorA(VELOCIDADE);
+  motorB(-VELOCIDADE);
+}
+
+void parar() {
+  motorA(0);
+  motorB(0);
+  movimentoAtivo = false;
+}
+
+void freiar() {
+
+  digitalWrite(A_IA, HIGH);
+  digitalWrite(A_IB, HIGH);
+
+  digitalWrite(B_IA, HIGH);
+  digitalWrite(B_IB, HIGH);
+
+  movimentoAtivo = false;
+}
+
+
+void iniciarMovimento(void (*funcaoMovimento)()) {
+
+  funcaoMovimento();
+
+  tempoInicio = millis();
+  movimentoAtivo = true;
+}
 
 void setup() {
+
+  serialdobluetooth.begin(9600);
   Serial.begin(9600);
-  SerialBT.begin(9600); // Comunicação com HC-05
 
   pinMode(A_IA, OUTPUT);
   pinMode(A_IB, OUTPUT);
@@ -21,111 +106,57 @@ void setup() {
 
   parar();
 
-  Serial.println("Carrinho Bluetooth iniciado");
-  Serial.println("Comandos: F, B, L, R, S");
+  Serial.println("Carrinho Bluetooth iniciado!");
+  Serial.println("F = Frente");
+  Serial.println("B = Tras");
+  Serial.println("L = Esquerda");
+  Serial.println("R = Direita");
+  Serial.println("S = Parar");
+  Serial.println("X = Freio");
 }
 
 void loop() {
-  char comando = '\0';
 
-  while (SerialBT.available()) {
-    char c = SerialBT.read();
+  // RECEBER COMANDO BLUETOOTH
+  if (serialdobluetooth.available()) {
 
-    if (c != '\n' && c != '\r' && c != ' ' && c != '\t') {
-      comando = c;
-    }
-  }
-
-  if (comando != '\0') {
-    comando = toupper(comando);
+    valordobluetooth = serialdobluetooth.read();
 
     Serial.print("Comando recebido: ");
-    Serial.println(comando);
+    Serial.println((char)valordobluetooth);
 
-    switch (comando) {
-      case 'F': frente(); break;
-      case 'B': re(); break;
-      case 'L': girarEsquerda(); break;
-      case 'R': girarDireita(); break;
-      case 'S': parar(); break;
+    if (valordobluetooth == 'F' || valordobluetooth == 'f') {
+      iniciarMovimento(frente);
+    }
 
-      default:
-        SerialBT.println("Comando invalido");
-        break;
+    else if (valordobluetooth == 'B' || valordobluetooth == 'b') {
+      iniciarMovimento(tras);
+    }
+
+    else if (valordobluetooth == 'L' || valordobluetooth == 'l') {
+      iniciarMovimento(esquerda);
+    }
+
+    else if (valordobluetooth == 'R' || valordobluetooth == 'r') {
+      iniciarMovimento(direita);
+    }
+
+    else if (valordobluetooth == 'S' || valordobluetooth == 's') {
+      parar();
+      Serial.println("Parada imediata");
+    }
+
+    else if (valordobluetooth == 'X' || valordobluetooth == 'x') {
+      freiar();
+      Serial.println("Freio acionado");
     }
   }
-}
 
-void motorDireito(int velocidade) {
-  velocidade = constrain(velocidade, -255, 255);
+  if (movimentoAtivo &&
+      millis() - tempoInicio >= TEMPO_MOVIMENTO) {
 
-  if (velocidade > 0) {
-    analogWrite(A_IA, velocidade);
-    analogWrite(A_IB, 0);
-  } 
-  else if (velocidade < 0) {
-    analogWrite(A_IA, 0);
-    analogWrite(A_IB, -velocidade);
-  } 
-  else {
-    analogWrite(A_IA, 0);
-    analogWrite(A_IB, 0);
+    parar();
+
+    Serial.println("Tempo encerrado - Carrinho parado");
   }
-}
-
-void motorEsquerdo(int velocidade) {
-  velocidade = constrain(velocidade, -255, 255);
-
-  if (velocidade > 0) {
-    analogWrite(B_IA, velocidade);
-    analogWrite(B_IB, 0);
-  } 
-  else if (velocidade < 0) {
-    analogWrite(B_IA, 0);
-    analogWrite(B_IB, -velocidade);
-  } 
-  else {
-    analogWrite(B_IA, 0);
-    analogWrite(B_IB, 0);
-  }
-}
-
-void frente() {
-  motorDireito(velocidade);
-  motorEsquerdo(velocidade);
-
-  Serial.println("Frente");
-  SerialBT.println("Frente");
-}
-
-void re() {
-  motorDireito(-velocidade);
-  motorEsquerdo(-velocidade);
-
-  Serial.println("Re");
-  SerialBT.println("Re");
-}
-
-void girarDireita() {
-  motorDireito(-velocidade);
-  motorEsquerdo(velocidade);
-
-  Serial.println("Girar direita");
-  SerialBT.println("Girar direita");
-}
-
-void girarEsquerda() {
-  motorDireito(velocidade);
-  motorEsquerdo(-velocidade);
-
-  Serial.println("Girar esquerda");
-  SerialBT.println("Girar esquerda");
-}
-
-void parar() {
-  motorDireito(0);
-  motorEsquerdo(0);
-
-  Serial.println("Parado");
-  SerialBT.println("Parado");
 }
